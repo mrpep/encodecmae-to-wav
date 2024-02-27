@@ -10,9 +10,11 @@ For training follow these steps:
 3) Clone this repository and also [this one](https://github.com/habla-liaa/encodecmae)
 4) Edit the [docker-compose file](https://github.com/mrpep/encodecmae-to-wav/blob/main/encodecmae-to-wav/docker-compose.yml). Modify the paths in volumes so that they point to: encodecmae repository, this repository, and the folder with the datasets. These folders will appear in the docker container inside the /workspace folder. Update the device_ids according to the gpus that you want to use inside the container for training.
 5) Update the paths in the configs/datasets as needed
-6) Run
-  ```docker compose up -d
-     docker attach encodecmae-to-wav-train
+6) Inside this repository folder run:
+  ```
+docker compose up -d
+docker attach encodecmae-to-wav-train
+
   ```
 7) An interactive shell will open. Run
 ```
