@@ -5,7 +5,7 @@ We provide pretrained weights for many of our models, and [this colab] so that y
 
 ### Training
 For training follow these steps:
-1) Gather training datasets and put them in a folder.
+1) Gather training datasets and put them in a folder. The datasets should have a sampling rate of 24 kHz.
 2) Install docker and docker-compose.
 3) Clone this repository and also [this one](https://github.com/habla-liaa/encodecmae)
 4) Edit the [docker-compose file](https://github.com/mrpep/encodecmae-to-wav/blob/main/encodecmae-to-wav/docker-compose.yml). Modify the paths in volumes so that they point to: encodecmae repository, this repository, and the folder with the datasets. These folders will appear in the docker container inside the /workspace folder. Update the device_ids according to the gpus that you want to use inside the container for training.
