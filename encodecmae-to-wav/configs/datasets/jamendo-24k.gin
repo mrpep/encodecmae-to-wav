@@ -1,0 +1,3 @@
+load_dataset.reader_fn+=[@jamendo_24k/read_audiodir]
+jamendo_24k/read_audiodir.dataset_path='/workspace/datasets/jamendo_24k'
+jamendo_24k/read_audiodir.dataset='jamendo'

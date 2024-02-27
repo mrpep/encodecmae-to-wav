@@ -1,0 +1,8 @@
+encodecmae_tasks.data.DictDataset:
+    out_cols=['wav']
+    preprocessors=[@encodecmae_tasks.features.ProcessorReadAudio]
+    
+encodecmae_tasks.features.ProcessorReadAudio:
+    input = 'filename'
+    max_length = %MAX_AUDIO_DURATION
+    output = 'wav'

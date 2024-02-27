@@ -1,0 +1,22 @@
+ENCODECMAE_MODEL='base'
+NUM_CLS_TOKENS=1
+NUM_ENCODER_LAYERS=2
+NUM_DENOISER_LAYERS=8
+SIGNAL_TO_GENERATE='wav_features'
+SIGNAL_DIM=128
+UNCONDITIONAL_PROBABILITY=0.1
+
+encodecmae_tasks.fit_model.model_cls=@encodecmae_decoder_models.TransformerAEDiffusion
+encodecmae_decoder_models.TransformerAEDiffusion:
+    optimizer=@torch.optim.AdamW
+    encodecmae_model=%ENCODECMAE_MODEL
+    num_cls_tokens=%NUM_CLS_TOKENS
+    num_encoder_layers=%NUM_ENCODER_LAYERS
+    num_denoiser_layers=%NUM_DENOISER_LAYERS
+    signal_to_generate=%SIGNAL_TO_GENERATE
+    signal_dim=%SIGNAL_DIM
+    unconditional_probability=%UNCONDITIONAL_PROBABILITY
+torch.optim.AdamW:
+    lr=%MAX_LR
+    betas=(0.9,0.95)
+    weight_decay=0.05
