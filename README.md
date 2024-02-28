@@ -1,4 +1,11 @@
-Code with implementation of models aiming to invert [EnCodecMAE](https://github.com/habla-liaa/encodecmae) features back to the waveform domain.
+<p align="center">
+  <img src="https://github.com/mrpep/encodecmae-to-wav/blob/main/back2waveform.png" title="Logo saying 'Back to the waveform'">
+</p>
+<p align="center">
+  Code with implementation of models aiming to invert <a href="https://github.com/habla-liaa/encodecmae">EnCodecMAE</a> features back to the waveform domain.
+</p>
+
+
 
 ### Inference
 We provide pretrained weights for many of our models, and [this colab](https://colab.research.google.com/drive/1vxAvLuzSe2QJkcSTzck96GBM35wIka_a?usp=sharing) demonstrates how to play around with them.
