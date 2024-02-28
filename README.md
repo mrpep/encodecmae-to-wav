@@ -30,7 +30,9 @@ pip install -e .
 11) In scripts/train.sh you will find a list of commands, each corresponding to a different experiment. Comment everything except the experiment to be ran. The batch size and other parameters can be modified in the --mods argument or by editing [this config](https://github.com/mrpep/encodecmae-to-wav/blob/main/encodecmae-to-wav/configs/base/decode_encodecmae.gin)
 12) Run scripts/train.sh and it should start training.
 
-If you found this code useful please cite:
+### Citation
+
+If you use this code or results in your paper, please cite our work as:
 ```
 @article{alonso2024leveraging,
   title={Leveraging pre-trained autoencoders for interpretable prototype learning of music audio},
