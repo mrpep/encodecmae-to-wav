@@ -14,7 +14,6 @@ For training follow these steps:
   ```
 docker compose up -d
 docker attach encodecmae-to-wav-train
-
   ```
 7) An interactive shell will open. Run
 ```
