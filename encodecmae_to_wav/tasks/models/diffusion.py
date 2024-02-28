@@ -72,7 +72,7 @@ class TransformerAEDiffusion(pl.LightningModule):
 
     def sample(self, code, steps=10, length=75, guidance_strength=0):
         with torch.no_grad():
-            sigmas = torch.linspace(1,0,steps+1)
+            sigmas = torch.linspace(1,0,steps+1).to(code.device)
             ts = self.time_embedding(sigmas[:,None,None])
             angle = sigmas * pi / 2
             alphas, betas = torch.cos(angle), torch.sin(angle)

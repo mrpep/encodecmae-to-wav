@@ -6,7 +6,7 @@ services:
     volumes:
       - /home/lpepino/encodecmaes/encodecmae:/workspace/encodecmae
       - /home/lpepino/encodecmaes/encodecmae-to-wav:/workspace/encodecmae-to-wav
-      - /home/lpepino/alpha_datasets:/workspace/datasets
+      - /mnt/data:/workspace/datasets
     ipc: host
     stdin_open: true
     tty: true
