@@ -6,7 +6,7 @@ import torch
 
 from functools import partial
 
-class TransformerDecoder(torch.nn.Module):
+class TransformerNet(torch.nn.Module):
     def __init__(self, model_dim, embedding_dim, num_decoder_layers=4, num_decoder_heads=12, apply_positional_encodings=True):
         super().__init__()
         self.posenc = SinusoidalPositionalEmbeddings(model_dim)
@@ -25,19 +25,26 @@ class TransformerDecoder(torch.nn.Module):
 class EnCodecDecoder(pl.LightningModule):
     def __init__(self, encodecmae_model='base', decoder_model=None, optimizer=None, lr_scheduler=None):
         super().__init__()
-        self.encodecmae_model = load_model(encodecmae_model)
-        model_dim = self.encodecmae_model.visible_encoder.model_dim
+        self.encoder = load_model(encodecmae_model)
+        self.encoder.downsample_factor = 75
+        model_dim = self.encoder.visible_encoder.model_dim
         self.decoder = decoder_model(model_dim=model_dim, embedding_dim=128)
         self.optimizer=optimizer
         self.lr_scheduler = lr_scheduler
         
-    def forward(self, x):
+    def encode(self, x):
         with torch.no_grad():
-            self.encodecmae_model.encode_wav(x)
-            self.encodecmae_model.mask(x, ignore_mask=True)
-            self.encodecmae_model.encode_visible(x)
-        
+            self.encoder.encode_wav(x)
+            self.encoder.mask(x, ignore_mask=True)
+            self.encoder.encode_visible(x)
+
+    def decode(self, x):
         x['reconstruction'] = self.decoder(x['visible_embeddings'],padding_mask=x['feature_padding_mask'])
+        return x
+
+    def forward(self, x):
+        self.encode(x)
+        self.decode(x)
         return x
 
     def calculate_loss(self, x):

@@ -6,8 +6,10 @@ import torch
 from tqdm import tqdm
 from encodec import EncodecModel
 import numpy as np
+from pathlib import Path
+from helpers import identify_state_dict_version, v1_to_v2_state_dict
 
-class ChunkSampler:
+class ChunkDiffusionSampler:
   def __init__(self, model):
     self.model = model
     self.model.unconditional_probability = 0
@@ -37,6 +39,28 @@ class ChunkSampler:
         outs[i*win_size:(i+1)*win_size] += outs[i*win_size:(i+1)*win_size] + reconstruction[0,0].detach().cpu().numpy()
     return outs
 
+class ChunkSampler:
+  def __init__(self, model):
+    self.model = model
+    self.model.eval()
+    self.ec = EncodecModel.encodec_model_24khz()
+    self.ec.to(self.model.device)
+
+  def encode(self, x):
+    codes = []
+    win_size = int(self.model.chunk_size*self.model.fs)
+    with torch.no_grad():
+      for i in range(0,x.shape[0],win_size):
+        X = {'wav': torch.from_numpy(x[i:i+win_size]).unsqueeze(0).to(self.model.device), 'wav_lens': torch.tensor([win_size,], device=self.model.device)}
+        self.model.encode(X)
+        codes.append(X['visible_embeddings'][0])
+    return torch.stack(codes)
+
+  def sample(self, codes):
+    out_length=int(codes.shape[0]*self.model.chunk_size*self.model.fs)
+    for i, c in enumerate(tqdm(codes)):
+      pass
+
 def get_available_models():
     fs = HfFileSystem()
     available_models = [x['name'].split('/')[-1] for x in fs.ls('lpepino/encodecmae2wav/models', refresh=True)]
@@ -47,7 +71,11 @@ def load_model(name, device='cuda:0'):
     gin.clear_config()
     available_models = get_available_models()
     if name not in available_models:
-        raise Exception('{} is not a valid model name. Valid names are: {}'.format(name,available_models))
+      if Path(name).exists():
+        ckpt_file = Path(name, 'weights.pt')
+        config_file = Path(name, 'config.gin')
+      else:
+        raise Exception('{} is not a valid model name. Valid names are: {} or local paths.'.format(name,available_models))
     else:
         ckpt_file = hf_hub_download(repo_id='lpepino/encodecmae2wav',filename='models/{}/weights.pt'.format(name))
         config_file = hf_hub_download(repo_id='lpepino/encodecmae2wav',filename='models/{}/config.gin'.format(name))
@@ -55,6 +83,9 @@ def load_model(name, device='cuda:0'):
     gin.parse_config_file(config_file)
     model = get_model()()
     ckpt = torch.load(ckpt_file)
+    sd_version = identify_state_dict_version(ckpt['state_dict'])
+    if sd_version == '1':
+      ckpt['state_dict'] = v1_to_v2_state_dict(ckpt['state_dict'])
     model.load_state_dict(ckpt['state_dict'])
     gin.clear_config()
     gin.parse_config(config_str)
@@ -62,10 +93,13 @@ def load_model(name, device='cuda:0'):
     with open(config_file,'r') as f:
       lines = f.readlines()
       max_audio_duration = [float(xi.split('=')[1].strip()) for xi in lines if 'MAX_AUDIO_DURATION' in xi][0]
-
+      meta_model = [xi.split('=')[1].strip().replace("'","").replace("\"","") for xi in lines if 'META_MODEL' in xi][0]
     model.chunk_size=max_audio_duration
     model.fs=24000
     model.rate = model.encoder.downsample_factor
     model.to(device)
-
-    return ChunkSampler(model)
+    
+    if meta_model == 'ChunkDiffusionSampler':
+      return ChunkDiffusionSampler(model)
+    elif meta_model == 'ChunkSampler':
+      return ChunkSampler(model)
