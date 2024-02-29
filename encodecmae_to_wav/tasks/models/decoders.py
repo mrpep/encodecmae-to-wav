@@ -27,6 +27,7 @@ class EnCodecDecoder(pl.LightningModule):
         super().__init__()
         self.encoder = load_model(encodecmae_model)
         self.encoder.downsample_factor = 75
+        self.encoder.visible_encoder.compile = False
         model_dim = self.encoder.visible_encoder.model_dim
         self.decoder = decoder_model(model_dim=model_dim, embedding_dim=128)
         self.optimizer=optimizer
