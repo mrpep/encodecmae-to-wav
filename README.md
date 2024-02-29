@@ -1,7 +1,14 @@
-Code with implementation of models aiming to invert [EnCodecMAE](https://github.com/habla-liaa/encodecmae) features back to the waveform domain.
+<p align="center">
+  <img src="https://github.com/mrpep/encodecmae-to-wav/blob/main/back2waveform.png" title="Logo saying 'Back to the waveform'">
+</p>
+<p align="center">
+  Code with implementation of models aiming to invert <a href="https://github.com/habla-liaa/encodecmae">EnCodecMAE</a> features back to the waveform domain.
+</p>
+
+
 
 ### Inference
-We provide pretrained weights for many of our models, and [this colab] so that you can play around with them.
+We provide pretrained weights for many of our models, and [this colab](https://colab.research.google.com/drive/1vxAvLuzSe2QJkcSTzck96GBM35wIka_a?usp=sharing) demonstrates how to play around with them.
 
 ### Training
 For training follow these steps:
@@ -14,7 +21,6 @@ For training follow these steps:
   ```
 docker compose up -d
 docker attach encodecmae-to-wav-train
-
   ```
 7) An interactive shell will open. Run
 ```
@@ -30,6 +36,22 @@ pip install -e .
 11) In scripts/train.sh you will find a list of commands, each corresponding to a different experiment. Comment everything except the experiment to be ran. The batch size and other parameters can be modified in the --mods argument or by editing [this config](https://github.com/mrpep/encodecmae-to-wav/blob/main/encodecmae-to-wav/configs/base/decode_encodecmae.gin)
 12) Run scripts/train.sh and it should start training.
 
-If you found the diffusion models useful please cite:
-PAPER PECMAE
-EnCodecMAE
+### Citation
+
+If you use this code or results in your paper, please cite our work as:
+```
+@article{alonso2024leveraging,
+  title={Leveraging pre-trained autoencoders for interpretable prototype learning of music audio},
+  author={Alonso Jim{\'e}nez, Pablo and Pepino, Leonardo and Batlle-Roca, Roser and Zinemanas, Pablo and Serra, Xavier and Rocamora, Mart{\'\i}n},
+  year={2024},
+  publisher={Institute of Electrical and Electronics Engineers (IEEE)}
+}
+```
+```
+@article{pepino2023encodecmae,
+  title={EnCodecMAE: Leveraging neural codecs for universal audio representation learning},
+  author={Pepino, Leonardo and Riera, Pablo and Ferrer, Luciana},
+  journal={arXiv preprint arXiv:2309.07391},
+  year={2023}
+}
+```
