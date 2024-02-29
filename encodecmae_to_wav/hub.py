@@ -89,7 +89,7 @@ def load_model(name, device='cuda:0'):
     gin_configure_externals({'module_list_str': 'encodecmae_to_wav.tasks.models:models', 'module_list':[]})
     gin.parse_config_file(config_file)
     model = get_model()()
-    ckpt = torch.load(ckpt_file)
+    ckpt = torch.load(ckpt_file, map_location='cpu')
     #sd_version = identify_state_dict_version(ckpt['state_dict'])
     #if sd_version == '1':
     #  ckpt['state_dict'] = v1_to_v2_state_dict(ckpt['state_dict'])
