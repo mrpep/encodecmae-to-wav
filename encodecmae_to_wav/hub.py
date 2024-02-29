@@ -7,7 +7,7 @@ from tqdm import tqdm
 from encodec import EncodecModel
 import numpy as np
 from pathlib import Path
-from helpers import identify_state_dict_version, v1_to_v2_state_dict
+from .helpers import identify_state_dict_version, v1_to_v2_state_dict
 
 class ChunkDiffusionSampler:
   def __init__(self, model):
@@ -36,7 +36,7 @@ class ChunkDiffusionSampler:
         rec = self.model.sample(c[None,None,:].to(self.model.device),steps=steps,guidance_strength=guidance_strength, length=int(self.model.chunk_size*self.model.rate))
         ecmae_features = rec[-1]
         reconstruction = self.ec.decoder(ecmae_features.transpose(1,2))
-        outs[i*win_size:(i+1)*win_size] += outs[i*win_size:(i+1)*win_size] + reconstruction[0,0].detach().cpu().numpy()
+        outs[i*win_size:(i+1)*win_size] += reconstruction[0,0].detach().cpu().numpy()
     return outs
 
 class ChunkSampler:
@@ -54,12 +54,19 @@ class ChunkSampler:
         X = {'wav': torch.from_numpy(x[i:i+win_size]).unsqueeze(0).to(self.model.device), 'wav_lens': torch.tensor([win_size,], device=self.model.device)}
         self.model.encode(X)
         codes.append(X['visible_embeddings'][0])
-    return torch.stack(codes)
+    return codes
 
   def sample(self, codes):
-    out_length=int(codes.shape[0]*self.model.chunk_size*self.model.fs)
-    for i, c in enumerate(tqdm(codes)):
-      pass
+    out_length=int(len(codes)*self.model.chunk_size*self.model.fs)
+    win_size = int(self.model.chunk_size*self.model.fs)
+    out = np.zeros((out_length,))
+    with torch.no_grad():
+      for i, c in enumerate(tqdm(codes)):
+        X = {'visible_embeddings': c.unsqueeze(0), 'feature_padding_mask': torch.zeros_like(c[:,0]).unsqueeze(0)}
+        self.model.decode(X)
+        wave_i = self.ec.decoder(X['reconstruction'].transpose(1,2))[0,0]
+        out[i*win_size:i*win_size+wave_i.shape[0]] += wave_i.detach().cpu().numpy()
+    return out
 
 def get_available_models():
     fs = HfFileSystem()
@@ -83,9 +90,9 @@ def load_model(name, device='cuda:0'):
     gin.parse_config_file(config_file)
     model = get_model()()
     ckpt = torch.load(ckpt_file)
-    sd_version = identify_state_dict_version(ckpt['state_dict'])
-    if sd_version == '1':
-      ckpt['state_dict'] = v1_to_v2_state_dict(ckpt['state_dict'])
+    #sd_version = identify_state_dict_version(ckpt['state_dict'])
+    #if sd_version == '1':
+    #  ckpt['state_dict'] = v1_to_v2_state_dict(ckpt['state_dict'])
     model.load_state_dict(ckpt['state_dict'])
     gin.clear_config()
     gin.parse_config(config_str)

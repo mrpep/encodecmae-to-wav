@@ -10,7 +10,7 @@ class TransformerNet(torch.nn.Module):
     def __init__(self, model_dim, embedding_dim, num_decoder_layers=4, num_decoder_heads=12, apply_positional_encodings=True):
         super().__init__()
         self.posenc = SinusoidalPositionalEmbeddings(model_dim)
-        self.trans = TransformerEncoder(model_dim=model_dim, num_layers=num_decoder_layers, attention_layer=partial(MultiHeadAttention,model_dim=model_dim, num_heads=num_decoder_heads))
+        self.trans = TransformerEncoder(model_dim=model_dim, num_layers=num_decoder_layers, attention_layer=partial(MultiHeadAttention,model_dim=model_dim, num_heads=num_decoder_heads),compile=False)
         self.lin = torch.nn.Linear(model_dim, embedding_dim)
         self.apply_positional_encodings = apply_positional_encodings
 
