@@ -10,6 +10,12 @@
 ### Inference
 We provide pretrained weights for many of our models, and [this colab](https://colab.research.google.com/drive/1vxAvLuzSe2QJkcSTzck96GBM35wIka_a?usp=sharing) demonstrates how to play around with them.
 
+| Model Name  | Upstream | Summary | Training Data | Model Type |
+| ----------- | -------- | ------- | ------------- | ---------- |
+| ecmae2ec-base-1LTransformer | EnCodecMAE Base | None | AS + LL + FMA | Regressor |
+| DiffTransformerAE2L8L1CLS-10s | EnCodecMAE Base | 10s | FMA + Jamendo | Diffusion |
+| DiffTransformerAE2L8L1CLS-4s | EnCodecMAE Base | 4s | FMA | Diffusion |
+
 ### Training
 For training follow these steps:
 1) Gather training datasets and put them in a folder. The datasets should have a sampling rate of 24 kHz.
